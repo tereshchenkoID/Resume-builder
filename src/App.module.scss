@@ -1,0 +1,14 @@
+@import "./styles/config";
+
+.block {
+  @include flex($direction: column);
+
+  min-height: 100vh;
+}
+
+.preloader {
+  @include size(100%, 300px);
+
+  position: relative;
+  z-index: 20;
+}

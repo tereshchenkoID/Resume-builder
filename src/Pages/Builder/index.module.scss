@@ -1,0 +1,308 @@
+@import "../../styles/config";
+
+.block {
+  display: grid;
+  flex-grow: 1;
+
+  @include media-breakpoint-up(lg) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.left,
+.right {
+  @include make-spacer('p', 5);
+  @include make-spacer('p', 10, lg);
+}
+
+.left {
+  background-color: var(--color-white);
+}
+
+.right {
+  @include flex(flex-end, center);
+
+  position: fixed;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  overflow: hidden;
+
+  @include media-breakpoint-up(lg) {
+    justify-content: center;
+    flex-direction: column;
+    top: 0;
+    left: unset;
+    background-color: var(--color-secondary);
+    width: 50%;
+  }
+}
+
+.resume {
+  display: none;
+
+  @include media-breakpoint-up(lg) {
+    @include flex(center, center);
+
+    //overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    &::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: var(--color-secondary);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border: 2px solid transparent;
+      background-clip: content-box;
+      background-color: var(--color-primary);
+    }
+  }
+}
+
+.head {
+  @include make-spacer('mb', 6);
+  @include flex($align-items: center, $direction: column);
+}
+
+.title {
+  @include make-spacer('mx', auto);
+  @include font-size(24px);
+
+  border: 0;
+  border-bottom: 1px solid transparent;
+  transition: var(--default-transition);
+  text-align: center;
+
+  &:focus {
+    outline: none;
+    border-bottom-color: var(--color-primary);
+  }
+}
+
+.grid {
+  @include make-spacer('mx', -3);
+  @include make-spacer('mb', 4);
+  @include flex($wrap: wrap);
+}
+
+.wrapper {
+  @include flex($justify-content: flex-end, $direction: column);
+  @include make-spacer('my', 3);
+  @include make-spacer('px', 3);
+
+  flex: 1 1 100%;
+
+  @include media-breakpoint-up(sm) {
+    flex: 1 1 50%;
+  }
+}
+
+.label {
+  @include make-spacer('mb', 2);
+
+  color: rgba(130, 139, 162, 1);
+}
+
+.field,
+.select {
+  @include make-spacer('py', 2);
+  @include make-spacer('px', 3);
+
+  display: block;
+  border: 0;
+  border-radius: var(--default-border-radius);
+  caret-color: var(--color-primary);
+  background-color: rgba(239, 242, 249, 1);
+  outline: none;
+  transition: color 0.1s ease 0s;
+
+  &:focus {
+    outline: 1px solid var(--color-primary);
+  }
+}
+
+.field,
+.select {
+  @include size(100%, 48px);
+}
+
+.select {
+  @include make-spacer('p', 2);
+}
+
+.toolbarClassName {
+  background-color: #eff2f9;
+
+  div {
+    min-height: 25px;
+    background-color: transparent;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+}
+
+.wrapperClassName {
+  background-color: #eff2f9;
+  border-radius: var(--default-border-radius);
+  overflow: hidden;
+}
+
+.editorClassName {
+  @include make-spacer('px', 4);
+
+  min-height: 220px;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.toolbarClassName {
+   background-color: #eff2f9;
+
+   div {
+     min-height: 25px;
+     background-color: transparent;
+
+     &:hover {
+       color: var(--color-primary);
+     }
+   }
+
+  img {
+    object-fit: contain;
+  }
+ }
+
+.wrapperClassName {
+  background-color: #eff2f9;
+  border-radius: var(--default-border-radius);
+  overflow: hidden;
+}
+
+.editorClassName {
+  @include make-spacer('px', 4);
+
+  min-height: 220px;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.button {
+  @include flex(center, center);
+  @include make-spacer('px', 2);
+  @include make-spacer('ml', 2);
+
+  border-radius: 3px;
+  color: var(--color-white);
+  background-color: var(--color-primary);
+  z-index: 1;
+  height: 40px;
+  white-space: nowrap;
+
+  &.download {
+
+    @include media-breakpoint-up(lg) {
+      right: 15px;
+    }
+  }
+
+  &.template {
+
+    @include media-breakpoint-up(lg) {
+      left: 15px;
+    }
+  }
+
+  svg {
+    @include make-spacer('mr', 1);
+    @include size(20px);
+
+    fill: currentColor;
+  }
+
+  @include media-breakpoint-up(lg) {
+    position: absolute;
+    bottom: 15px;
+  }
+}
+
+.dropped {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  align-items: center;
+  grid-gap: 10px;
+}
+
+.photo {
+  @include size(80px);
+
+  background-color: #eff2f9;
+  background-size: cover;
+  border-radius: var(--default-border-radius);
+  overflow: hidden;
+
+  svg {
+    fill: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.save {
+  @include make-spacer('mb', 2);
+  @include flex(center, center);
+
+  color: var(--color-secondary);
+
+  svg {
+    @include make-spacer('mr', 1);
+
+    path {
+      fill: currentColor;
+    }
+  }
+
+  &:hover {
+    color: var(--color-primary);
+  }
+}
+
+.link {
+  @include font-size(15px, 18px);
+  @include make-spacer('my', 1);
+
+  cursor: pointer;
+  font-weight: var(--typography-medium);
+  transition: var(--default-transition);
+
+  &.primary {
+    color: var(--color-primary);
+  }
+
+  &.default {
+    color: rgba(0, 0, 0, 0.4);
+
+    &:hover {
+      color: #f00;
+    }
+  }
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 11;
+
+  &.active {
+    @include flex(center, center);
+  }
+}

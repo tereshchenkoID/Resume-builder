@@ -1,0 +1,9 @@
+@import '../../styles/config';
+
+.block {
+  @include size(130px, 60px);
+
+  picture {
+    transform: translateX(-10px);
+  }
+}

@@ -1,0 +1,113 @@
+@import '../../styles/config';
+
+.block {
+  @include flex($direction: column);
+  @include size(100%, 680px);
+
+  border-radius: 6px;
+  background-color: rgb(15, 20, 30);
+  overflow: hidden;
+  max-width: 680px;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.header,
+.footer {
+  @include make-spacer('px', 5);
+  @include flex(flex-end, center);
+
+  height: 70px;
+  flex-shrink: 0;
+}
+
+.header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.body {
+  @include flex(center, center, column);
+  @include make-spacer('py', 4);
+
+  flex-grow: 1;
+}
+
+.content {
+  @include make-spacer('mb', 4);
+
+  text-align: center;
+  line-height: 1.5;
+}
+
+.icon {
+  @include make-spacer('mx', auto);
+  @include make-spacer('mb', 4);
+  @include size(48px);
+}
+
+.text {
+  max-width: 250px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.close {
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.2);
+
+  &:hover {
+    color: var(--color-primary);
+  }
+
+  svg {
+    fill: currentColor;
+  }
+}
+
+.box {
+  @include size(300px);
+
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+
+  &::after,
+  &::before {
+    position: absolute;
+    pointer-events: none;
+    content: '';
+  }
+
+  &::after {
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    width: 33.33%;
+  }
+
+  &::before {
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    height: 33.33%;
+  }
+}
+
+.button {
+  @include make-spacer('px', 5);
+  @include make-spacer('py', 2);
+
+  border-radius: var(--default-border-radius);
+  color: var(--color-white);
+  background-color: var(--color-primary);
+}

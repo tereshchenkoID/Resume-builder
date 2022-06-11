@@ -1,0 +1,65 @@
+body {
+  @include smooth-font;
+
+  background-color: #fff;
+  font-family: var(--font-family);
+  font-weight: var(--font-weight);
+  font-size: var(--font-size);
+  color: var(--font-color);
+  line-height: var(--line-height);
+  min-width: var(--min-width);
+
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: var(--color-secondary);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    background-clip: content-box;
+    background-color: var(--color-primary);
+  }
+}
+
+a,
+button {
+  cursor: pointer;
+  transition: var(--default-transition);
+  font-family: var(--font-family-additional);
+}
+
+a {
+  color: var(--font-color);
+  text-decoration: none;
+}
+
+button {
+  @include reset-button;
+
+  overflow: hidden;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+textarea,
+input {
+  font-size: 16px;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+svg,
+picture,
+img {
+  @include size(100%);
+
+  display: block;
+  object-fit: cover;
+}

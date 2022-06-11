@@ -1,0 +1,117 @@
+@import '../../../styles/base/variables/abstract/index';
+@import '../../../styles/abstract/helpers/index';
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Roboto:wght@400;500&display=swap');
+
+.block {
+  @include size(793.701px, auto);
+
+  min-height: 1122.52px;
+
+  //@include size(595.28px, 841.89px);
+
+  --color-white: #fff;
+  --color-black: #000;
+  --color-primary: #082A4D;
+  --color-title: #000;
+  --color-text: #000;
+
+  --font-family: 'Roboto', sans-serif;
+  --font-family-additional: 'Roboto Condensed', serif;
+  --font-weight: 400;
+  --font-size: 16px;
+  --font-color: var(--color-text);
+  --line-height: 1.5;
+  --typography-regular: 400;
+  --typography-medium: 500;
+
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  align-items: center;
+  font-family: var(--font-family);
+  line-height: var(--line-height);
+  background-color: #fff;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @include make-spacer('p', 0);
+    @include make-spacer('mt', 0);
+    @include make-spacer('mb', 2);
+
+    font-family: var(--font-family-additional);
+    font-weight: var(--typography-medium);
+  }
+
+  h1 {
+    @include font-size(38px, 44px);
+  }
+
+  h2 {
+    @include font-size(34px, 40px);
+  }
+
+  h3 {
+    @include font-size(30px, 36px);
+  }
+
+  h4 {
+    @include font-size(24px, 30px);
+  }
+
+  h5 {
+    @include font-size(20px, 26px);
+  }
+
+  h6 {
+    @include font-size(18px, 24px);
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+.left,
+.right {
+  @include make-spacer('py', 10);
+  @include make-spacer('px', 5);
+
+  height: 100%;
+}
+
+.right {
+  background-color: var(--color-primary);
+
+  * {
+    color: var(--color-white);
+  }
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  grid-gap: 20px;
+}
+
+.wrapper {
+  @include make-spacer('mb', 6);
+}
+
+.item {
+  @include make-spacer('mb', 2);
+  @include font-size(14px, 16px);
+}
+
+.photo {
+  @include size(80px);
+
+  overflow: hidden;
+
+  img {
+    object-position: top;
+  }
+}

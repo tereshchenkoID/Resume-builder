@@ -1,0 +1,56 @@
+:root {
+  --font-family: 'Roboto', sans-serif;
+  --font-family-additional: 'Roboto Condensed', sans-serif;
+
+  --font-weight: 300;
+  --font-size: 16px;
+  --font-color: var(--color-text);
+  --line-height: 1;
+
+  --typography-regular: 400;
+  --typography-medium: 500;
+  --typography-bold: 700;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @include make-spacer('mb', 4);
+
+  color: var(--color-title);
+  font-family: var(--font-family-alt);
+  font-weight: var(--typography-medium);
+}
+
+h1,
+.h1 {
+  @include font-size(40px, 45px);
+}
+
+h2,
+.h2 {
+  @include font-size(40px, 45px);
+}
+
+h3,
+.h3 {
+  @include font-size(40px, 45px);
+}
+
+h4,
+.h4 {
+  @include font-size(30px, 37px);
+}
+
+h5,
+.h5 {
+  @include font-size(28px, 35px);
+}
+
+h6,
+.h6 {
+  @include font-size(24px, 30px);
+}

@@ -1,0 +1,79 @@
+@import '../../../styles/config';
+
+.block {
+  cursor: pointer;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+
+  &.active,
+  &:hover {
+
+    .preview {
+      outline: 3px solid var(--color-primary);
+    }
+  }
+
+  &.active {
+
+    .text {
+      color: var(--color-primary)
+    }
+
+    .icon {
+      opacity: 1;
+    }
+  }
+}
+
+.text {
+  @include make-spacer('px', 2);
+  @include make-spacer('px', 0, sm);
+  @include make-spacer('mb', 2, sm);
+}
+
+.preview {
+  display: none;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--default-border-radius);
+  height: 225px;
+  transition: var(--default-transition);
+
+  @include media-breakpoint-up(sm) {
+    display: block;
+  }
+}
+
+.image {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-size: cover;
+}
+
+.resume {
+  @include flex(center, center);
+
+  overflow: hidden;
+}
+
+.icon {
+  @include flex(center, center);
+  @include size(40px);
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  border-radius: 50%;
+  color: var(--color-white);
+  background-color: var(--color-primary);
+  opacity: 0;
+
+  svg {
+    fill: currentColor;
+  }
+}
