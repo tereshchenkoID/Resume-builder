@@ -27,6 +27,7 @@
   left: 0;
   bottom: 0;
   overflow: hidden;
+  z-index: 1;
 
   @include media-breakpoint-up(lg) {
     justify-content: center;
@@ -44,9 +45,7 @@
   @include media-breakpoint-up(lg) {
     @include flex(center, center);
 
-    //overflow: hidden;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
 
     &::-webkit-scrollbar {
       width: 10px;
@@ -304,5 +303,38 @@
 
   &.active {
     @include flex(center, center);
+  }
+}
+
+.count {
+  @include make-spacer('mb', 2);
+
+  display: none;
+
+  @include media-breakpoint-up(lg) {
+    @include flex(center, center);
+  }
+
+
+  color: var(--color-white);
+
+  span {
+    @include make-spacer('mx', 1);
+  }
+}
+
+.arrow {
+  color: var(--color-white);
+
+  &:first-child {
+    transform: rotateZ(180deg);
+  }
+
+  &:hover {
+    color: var(--color-primary);
+  }
+
+  svg {
+    fill: currentColor;
   }
 }

@@ -6,7 +6,7 @@
 .block {
   @include size(793.701px, auto);
 
-  min-height: 1122.52px;
+  min-height: 1122px;
 
   //@include size(595.28px, 841.89px);
 
@@ -26,11 +26,19 @@
   --typography-medium: 500;
 
   display: grid;
-  grid-template-columns: 1fr 400px;
+  grid-template-columns: 1fr 300px;
   align-items: center;
   font-family: var(--font-family);
   line-height: var(--line-height);
   background-color: #fff;
+
+  ol,
+  ul {
+
+    li {
+      @include make-spacer('mb', 2);
+    }
+  }
 
   h1,
   h2,
@@ -110,8 +118,4 @@
   @include size(80px);
 
   overflow: hidden;
-
-  img {
-    object-position: top;
-  }
 }

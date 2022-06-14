@@ -4,7 +4,7 @@ import Dropzone from 'react-dropzone'
 
 import styles from './index.module.scss';
 
-const Dropped = ({remove, action, close}) => {
+const Dropped = ({remove, action, close, updateCanvas}) => {
     let editor
     const setEditorRef = (file) => (editor = file)
     const [dropped, setDropped] = useState('')
@@ -75,6 +75,7 @@ const Dropped = ({remove, action, close}) => {
                                 action(editor.getImage().toDataURL())
                                 localStorage.setItem('photo', JSON.stringify(editor.getImage().toDataURL()));
                                 close(false)
+                                updateCanvas()
                             }
                         }}
                     >

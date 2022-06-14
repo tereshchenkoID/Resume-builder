@@ -2,10 +2,12 @@ import React, {useState, useEffect, useRef} from "react";
 import {useSelector} from "react-redux";
 import {NavLink} from "react-router-dom";
 
-import classNames from "classnames";
+// import classNames from "classnames";
 
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
+import getConstant from "../../helpers/getConstant";
+
+// import { jsPDF } from "jspdf";
+// import html2canvas from "html2canvas";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 import Card from "./Card";
@@ -17,67 +19,56 @@ const Sydney = React.lazy(() => import('../Templates/Sydney'))
 
 const Edit = () => {
     const ref = useRef(null);
+    const refResume = useRef(null);
 
     const templates = [
         {
-            name: 'Sydney',
-            preview: 'https://s3.resume.io/uploads/local_template_image/image/441/persistent-resource/sydney-resume-templates.jpg'
-        },
-        {
             name: 'Dublin',
             preview: 'https://s3.resume.io/uploads/local_template_image/image/488/persistent-resource/dublin-resume-templates.jpg'
+        },
+        {
+            name: 'Sydney',
+            preview: 'https://s3.resume.io/uploads/local_template_image/image/441/persistent-resource/sydney-resume-templates.jpg'
         }
     ]
 
     const { config } = useSelector(state => state.configReducer)
 
-    const a4 = {
-        height: 1122.52,
-        width: 793.701,
-        diff: 1.41428
-    }
+    const a4 = getConstant().a4
+    const user = JSON.parse(localStorage.getItem('user'))
+    const photo = JSON.parse(localStorage.getItem('photo'))
+
     const [height, setHeight] = useState(0)
     const [width, setWidth] = useState(0)
     const [scale, setScale] = useState(0)
-
-    const user = JSON.parse(localStorage.getItem('user'))
-    const photo = JSON.parse(localStorage.getItem('photo'))
     const [template, setTemplate] = useState(JSON.parse(localStorage.getItem('template')) || templates[0].name)
 
-    const saveToPdf = () => {
-        html2canvas(document.getElementById('resume')).then(
-            (canvas) => {
-                const contentWidth = canvas.width;
-                const contentHeight = canvas.height;
-
-                // const pageHeight = contentWidth / 594 * 842;
-                // let leftHeight = contentHeight;
-                // let position = 0;
-                const imgWidth = 596;
-                const imgHeight = 596 / contentWidth * contentHeight;
-
-                const pageData = canvas.toDataURL('image/jpeg', 1.0);
-
-                const pdf = new jsPDF('', 'pt', 'a4');
-
-                // if (leftHeight < pageHeight) {
-                //     pdf.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight );
-                // } else {
-                //     while(leftHeight > 0) {
-                //         pdf.addImage(pageData, 'JPEG', 0, position, imgWidth, imgHeight)
-                //         leftHeight -= pageHeight;
-                //         position -= 842;
-                //         if(leftHeight > 0) {
-                //             pdf.addPage();
-                //         }
-                //     }
-                // }
-
-                pdf.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight);
-                pdf.save('content.pdf');
-            }
-        )
-    }
+    // const saveToPdf = () => {
+    //     html2canvas(
+    //         refResume.current,
+    //     {
+    //         scale: 2,
+    //         imageTimeout: 0,
+    //         backgroundColor:	'#fff'
+    //     }
+    //     ).then(
+    //         (canvas) => {
+    //             const contentWidth = canvas.width;
+    //             const contentHeight = canvas.height;
+    //
+    //             const imgWidth = 596;
+    //             const imgHeight = 596 / contentWidth * contentHeight;
+    //
+    //             canvas.getContext('2d');
+    //
+    //             const pageData = canvas.toDataURL('image/jpeg', 1.0);
+    //             const pdf = new jsPDF('p', 'pt', 'a4');
+    //
+    //             pdf.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight);
+    //             pdf.save('content.pdf');
+    //         }
+    //     )
+    // }
 
     useEffect(() => {
         const resizeObserver = new ResizeObserver((event) => {
@@ -113,15 +104,14 @@ const Edit = () => {
                     </svg>
                     Back to Editor
                 </NavLink>
-
-                <button
-                    className={classNames(styles.button, styles.download)}
-                    onClick={() => {
-                        saveToPdf()
-                    }}
-                >
-                    Download PDF
-                </button>
+                {/*<button*/}
+                {/*    className={classNames(styles.button, styles.download)}*/}
+                {/*    onClick={() => {*/}
+                {/*        saveToPdf()*/}
+                {/*    }}*/}
+                {/*>*/}
+                {/*    Download PDF*/}
+                {/*</button>*/}
             </div>
 
             <div className={styles.left}>
@@ -144,7 +134,7 @@ const Edit = () => {
             >
                 <div
                     className={styles.resume}
-                    id={'resume'}
+                    ref={refResume}
                     style={{
                         height: height,
                         width: width

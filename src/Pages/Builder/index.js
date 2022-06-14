@@ -1,10 +1,13 @@
 import React, {useState, useEffect, useRef} from "react";
 import {useSelector} from "react-redux";
 import {NavLink} from "react-router-dom";
+
 import classNames from "classnames";
 
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
+
+import { useDebouncedCallback } from 'use-debounce';
 
 import { Editor } from "react-draft-wysiwyg";
 import { EditorState, ContentState } from 'draft-js';
@@ -14,23 +17,51 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 import Dropped from "../../Components/Dropped";
 
+import getConstant from "../../helpers/getConstant";
+
 import styles from './index.module.scss';
 
 const Dublin = React.lazy(() => import('../Templates/Dublin'))
 const Sydney = React.lazy(() => import('../Templates/Sydney'))
 
+const initData = (data) => {
+    let result = {
+        title: 'Title'
+    }
+
+    data.fieldset.map((item, index) => {
+        item.fields.map((subitem, subindex) => {
+            if (subitem.options) {
+                const find = subitem.options.find(function(e){ return e.selected })
+
+                result[subitem.name] = {
+                    value: find.value,
+                    label: find.name
+                }
+            }
+            else {
+                result[subitem.name] = subitem.value
+            }
+
+            return true
+        })
+
+        return true
+    })
+
+    return result
+}
+
 const Main = () => {
     const ref = useRef(null);
+    const refCanvas = useRef(null);
+    const refTemplate = useRef(null);
 
     const { config } = useSelector(state => state.configReducer)
 
-    const template = JSON.parse(localStorage.getItem('template')) || 'Dublin'
+    const a4 = getConstant().a4
 
-    const a4 = {
-        height: 1122.52,
-        width: 793.701,
-        diff: 1.41428
-    }
+    const template = JSON.parse(localStorage.getItem('template')) || 'Dublin'
 
     const [modal, setModal] = useState(false)
     const [height, setHeight] = useState(0)
@@ -40,30 +71,15 @@ const Main = () => {
     const [remove, setRemove] = useState(false)
 
     const [photo, setPhoto] = useState(JSON.parse(localStorage.getItem('photo')) || '')
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || {title: 'Title'})
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || initData(config))
 
-    const handleEditorChange = (state, name) => {
-        convertContentToHTML(state, name);
-    }
+    let [current, setCurrent] = useState(parseInt(localStorage.getItem('current'), 10) || 0)
 
-    const convertContentToHTML = (state, name) => {
-        let currentContentAsHTML = convertToHTML(state.getCurrentContent());
+    const [init, setInit] = useState(false)
+    const [pages, setPages] = useState(0)
 
-        setUser(prevState => ({
-            ...prevState,
-            [name]: currentContentAsHTML
-        }));
-
-        localStorage.setItem('user', JSON.stringify(user))
-    }
-
-    const handleChange = e => {
+    const handleChange = useDebouncedCallback((e) => {
         const {name, value} = e.target;
-
-        setUser(prevState => ({
-            ...prevState,
-            [name]: value
-        }));
 
         if (e.target.type === 'select-one') {
             setUser(prevState => ({
@@ -80,100 +96,31 @@ const Main = () => {
                 [name]: value
             }));
         }
-    };
+
+        updateCanvas()
+    }, 1000);
+
+    const handleEditorChange = useDebouncedCallback((state, name) => {
+        convertContentToHTML(state, name);
+    }, 1000);
+
+    const convertContentToHTML = (state, name) => {
+        let currentContentAsHTML = convertToHTML(state.getCurrentContent());
+
+        setUser(prevState => ({
+            ...prevState,
+            [name]: currentContentAsHTML
+        }));
+
+        localStorage.setItem('user', JSON.stringify(user))
+
+        updateCanvas()
+    }
 
     const convertToEditor = (html) => {
         const contentBlock = htmlToDraft(html);
         const contentState = ContentState.createFromBlockArray(contentBlock.contentBlocks);
         return EditorState.createWithContent(contentState);
-    }
-
-    const saveToPdf = () => {
-        const HTML_Width = document.getElementById(template.toLowerCase()).offsetWidth;
-        const HTML_Height = document.getElementById(template.toLowerCase()).offsetHeight;
-        const PDF_Width = HTML_Width;
-        const PDF_Height = PDF_Width * 1.41428;
-        const canvas_image_width = HTML_Width;
-        const canvas_image_height = HTML_Height;
-
-        const totalPDFPages = Math.ceil(HTML_Height / PDF_Height) - 1;
-
-        console.log(document.getElementById(template.toLowerCase()).offsetWidth)
-
-        html2canvas(
-            document.getElementById(template.toLowerCase())).then(
-            (canvas) => {
-                // const contentWidth = canvas.width;
-                // const contentHeight = canvas.height;
-                //
-                // //Страница pdf отображает высоту холста, сгенерированную html-страницей;
-                // const pageHeight = contentWidth / 594 * 842;
-                //
-                // //Высота html страницы pdf не генерируется
-                // let leftHeight = contentHeight;
-                //
-                // //смещение страницы
-                // let position = 0;
-                //
-                // //Размер бумаги формата а4 [595.28, 841.89], ширина и высота холста, сгенерированного html-страницей в pdf
-                // const imgWidth = 596;
-                // const imgHeight = 596 / contentWidth * contentHeight;
-                //
-                // const pageData = canvas.toDataURL('image/jpeg', 1.0);
-                //
-                // const pdf = new jsPDF('', 'pt', 'a4');
-                //
-                // // Есть две высоты, которые нужно различать: одна — фактическая высота html-страницы, а другая — высота страницы, на которой создается PDF-файл (841,89)
-                // // Когда содержимое не превышает диапазон, отображаемый на одной странице pdf, пейджинг не требуется
-                // if (leftHeight < pageHeight) {
-                //     pdf.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight );
-                // } else {
-                //     while(leftHeight > 0) {
-                //         pdf.addImage(pageData, 'JPEG', 0, position, imgWidth, imgHeight)
-                //         leftHeight -= pageHeight;
-                //         position -= 842;
-                //
-                //         // Избегайте добавления пустых страниц
-                //         if(leftHeight > 0) {
-                //             pdf.addPage();
-                //         }
-                //     }
-                // }
-
-                // pdf.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight);
-                // pdf.save('content.pdf');
-
-                canvas.getContext('2d');
-
-                console.log(canvas)
-
-                const imgData = canvas.toDataURL("image/jpeg", 1.0);
-                const pdf = new jsPDF('p', 'pt',  [PDF_Width, PDF_Height]);
-
-                pdf.addImage(
-                    imgData,
-                    'JPG',
-                    0,
-                    0,
-                    canvas_image_width,
-                    canvas_image_height
-                );
-
-                for (let i = 1; i <= totalPDFPages; i++) {
-                    pdf.addPage();
-                    pdf.addImage(
-                        imgData,
-                        'JPG',
-                        0,
-                        -(PDF_Height * i) + 20,
-                        canvas_image_width,
-                        canvas_image_height
-                    );
-                }
-
-                pdf.save('content.pdf');
-            }
-        )
     }
 
     const sendData = () => {
@@ -183,6 +130,153 @@ const Main = () => {
         }
 
         console.log(data)
+    }
+
+    const saveToPdf = () => {
+        const HTML_Width = refTemplate.current.offsetWidth;
+        const HTML_Height = refTemplate.current.offsetHeight;
+        const PDF_Width = HTML_Width;
+        const PDF_Height = PDF_Width * a4.diff;
+
+        html2canvas(
+            refTemplate.current,
+            {
+                scale: 2,
+                imageTimeout: 0
+            }
+        ).then(
+            (canvas) => {
+                canvas.getContext('2d');
+                const imgData = canvas.toDataURL("image/jpeg", 1.0);
+                const pdf = new jsPDF('p', 'pt',  [PDF_Width, PDF_Height]);
+
+                pdf.addImage(
+                    imgData,
+                    'JPG',
+                    0,
+                    0,
+                    HTML_Width,
+                    HTML_Height
+                );
+
+                for (let i = 1; i <= pages; i++) {
+                    pdf.addPage();
+                    pdf.addImage(
+                        imgData,
+                        'JPG',
+                        0,
+                        -(PDF_Height * i),
+                        HTML_Width,
+                        HTML_Height
+                    );
+                }
+
+                pdf.save('content.pdf');
+            }
+        )
+    }
+
+    const initPages = () => {
+        if (!init) {
+            const HTML_Width = refTemplate.current.offsetWidth;
+            const HTML_Height = refTemplate.current.offsetHeight;
+            const PDF_Width = HTML_Width;
+            const PDF_Height = PDF_Width * a4.diff;
+
+            setPages(Math.ceil(HTML_Height / PDF_Height) - 1)
+
+            // if (current > pages) {
+            //     setCurrent(pages)
+            //     localStorage.setItem('current', pages)
+            // }
+
+            refCanvas.current.innerHTML = '';
+
+            html2canvas(
+                refTemplate.current,
+                {
+                    scale: 2,
+                    imageTimeout: 0,
+                    backgroundColor:	'#fff',
+                    height: PDF_Height * (Math.ceil(HTML_Height / PDF_Height) + 1)
+                }
+            ).then(
+                (canvas) => {
+                    canvas.getContext('2d');
+                    canvas.style = `width: ${PDF_Width}px; transform: translateY(-${current * PDF_Height}px);`
+
+                    setInit(true)
+
+                    refCanvas.current.appendChild(canvas)
+                }
+            )
+        }
+    }
+
+    const prevPages = () => {
+        if (current > 0) {
+            setCurrent(--current)
+            localStorage.setItem('current', current)
+
+            const HTML_Width = refTemplate.current.offsetWidth;
+            const PDF_Width = HTML_Width;
+            const PDF_Height = PDF_Width * a4.diff;
+
+            refCanvas.current.innerHTML = '';
+
+            html2canvas(
+                refTemplate.current,
+                {
+                    scale: 2,
+                    imageTimeout: 0,
+                    backgroundColor:	'#fff',
+                    height: a4.height * (pages + 1)
+                }
+            ).then(
+                (canvas) => {
+                    canvas.getContext('2d');
+                    canvas.style = `width: ${PDF_Width}px; transform: translateY(-${current * PDF_Height}px)`
+
+                    refCanvas.current.appendChild(canvas)
+                }
+            )
+        }
+    }
+
+    const nextPages = () => {
+        if (current < pages) {
+            setCurrent(++current)
+            localStorage.setItem('current', current)
+
+            const HTML_Width = refTemplate.current.offsetWidth;
+            const PDF_Width = HTML_Width;
+            const PDF_Height = PDF_Width * 1.41428;
+
+            refCanvas.current.innerHTML = '';
+
+            html2canvas(
+                refTemplate.current,
+                {
+                    scale: 2,
+                    imageTimeout: 0,
+                    backgroundColor:	'#fff',
+                    height: a4.height * (pages + 1)
+                }
+            ).then(
+                (canvas) => {
+                    canvas.getContext('2d');
+                    canvas.style = `width: ${PDF_Width}px; transform: translateY(-${current * PDF_Height}px)`
+
+                    refCanvas.current.appendChild(canvas)
+                }
+            )
+
+        }
+    }
+
+    const updateCanvas = () => {
+        setInit(false)
+        initPages()
     }
 
     useEffect(() => {
@@ -208,10 +302,10 @@ const Main = () => {
 
         localStorage.setItem('user', JSON.stringify(user))
 
-        // pagesCount = document.getElementById(template.toLowerCase()) && Math.ceil(document.getElementById(template.toLowerCase()).offsetHeight / document.getElementById(template.toLowerCase()).offsetWidth * 1.41428);
-
-        // console.log(pagesCount)
-    }, [user, scale]);
+        if (refTemplate) {
+            refTemplate.current && initPages()
+        }
+    }, [user, scale, init]);
 
     return (
         <div className={styles.block}>
@@ -220,6 +314,7 @@ const Main = () => {
                     remove={remove}
                     action={setPhoto}
                     close={setModal}
+                    updateCanvas={updateCanvas}
                 />
             </div>
 
@@ -289,6 +384,7 @@ const Main = () => {
                                                         onClick={() => {
                                                             setPhoto('')
                                                             setRemove(true)
+                                                            updateCanvas()
                                                             localStorage.removeItem('photo')
                                                         }}
                                                     >
@@ -310,7 +406,7 @@ const Main = () => {
                                                             pattern={item.validation}
                                                             required={item.required}
                                                             name={item.name}
-                                                            defaultValue={user[item.name]}
+                                                            defaultValue={user[item.name] || item.value}
                                                             onChange={(e) => handleChange(e)}
                                                         />
                                                     </div>
@@ -321,7 +417,7 @@ const Main = () => {
                                                             onEditorStateChange={(state) => {
                                                                 handleEditorChange(state, item.name)
                                                             }}
-                                                            defaultEditorState={convertToEditor(user[item.name] || '<p></p>')}
+                                                            defaultEditorState={convertToEditor(user[item.name] || `<p>${item.value}</p>`)}
                                                             toolbarClassName={styles.toolbarClassName}
                                                             wrapperClassName={styles.wrapperClassName}
                                                             editorClassName={styles.editorClassName}
@@ -337,9 +433,7 @@ const Main = () => {
                                                             className={styles.select}
                                                             required={item.required}
                                                             name={item.name}
-                                                            onChange={(e) => {
-                                                                handleChange(e)
-                                                            }}
+                                                            onChange={(e) => handleChange(e)}
                                                         >
                                                             {
                                                                 item.options.map((option, index) =>
@@ -366,10 +460,39 @@ const Main = () => {
                     )
                 }
             </div>
-            <div className={styles.right} ref={ref}>
+            <div
+                className={styles.right}
+                ref={ref}
+            >
+                <div className={styles.count}>
+                    <button
+                        className={styles.arrow}
+                        onClick={() => {
+                            prevPages()
+                        }}
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.32427537,7.23715414 L10.6757246,5.76284586 L16.6757246,11.2628459 C17.1080918,11.6591824 17.1080918,12.3408176 16.6757246,12.7371541 L10.6757246,18.2371541 L9.32427537,16.7628459 L14.5201072,12 L9.32427537,7.23715414 Z" />
+                        </svg>
+                    </button>
+                    <p>
+                        <strong>{current}</strong>
+                        <span>/</span>
+                        <strong>{pages}</strong>
+                    </p>
+                    <button
+                        className={styles.arrow}
+                        onClick={() => {
+                            nextPages()
+                        }}
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.32427537,7.23715414 L10.6757246,5.76284586 L16.6757246,11.2628459 C17.1080918,11.6591824 17.1080918,12.3408176 16.6757246,12.7371541 L10.6757246,18.2371541 L9.32427537,16.7628459 L14.5201072,12 L9.32427537,7.23715414 Z" />
+                        </svg>
+                    </button>
+                </div>
                 <div
                     className={styles.resume}
-                    id={'resume'}
                     style={{
                         height: height,
                         width: width
@@ -385,28 +508,22 @@ const Main = () => {
                         }}
                     >
                         {
-                            template === 'Dublin' && <Dublin config={config} user={user} photo={photo}/>
+                            template === 'Dublin' && <Dublin config={config} user={user} photo={photo} refTemplate={refTemplate}/>
                         }
                         {
-                            template === 'Sydney' && <Sydney config={config} user={user} photo={photo} scale={scale}/>
+                            template === 'Sydney' && <Sydney config={config} user={user} photo={photo} refTemplate={refTemplate}/>
                         }
                     </div>
                     <div
+                        className={styles.canvas}
+                        ref={refCanvas}
                         style={{
                             height: a4.height,
                             width: a4.width,
                             transform: `scale(${scale})`
                         }}
-                    >
-                        {
-                            template === 'Dublin' && <Dublin config={config} user={user} photo={photo}/>
-                        }
-                        {
-                            template === 'Sydney' && <Sydney config={config} user={user} photo={photo} scale={scale}/>
-                        }
-                    </div>
+                    />
                 </div>
-
                 <NavLink
                     to="/edit"
                     className={classNames(styles.button, styles.template)}
@@ -416,7 +533,6 @@ const Main = () => {
                     </svg>
                     Select Template
                 </NavLink>
-
                 <button
                     className={classNames(styles.button, styles.download)}
                     onClick={() => {

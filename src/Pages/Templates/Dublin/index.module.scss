@@ -6,7 +6,7 @@
 .block {
   @include size(793.701px, auto);
 
-  min-height: 1122.52px;
+  min-height: 1122px;
 
   //@include size(595.28px, auto);
 
@@ -32,6 +32,14 @@
   font-family: var(--font-family);
   line-height: var(--line-height);
   background-color: #fff;
+
+  ol,
+  ul {
+
+    li {
+      @include make-spacer('mb', 2);
+    }
+  }
 
   h1,
   h2,
@@ -124,9 +132,4 @@
 
   border-radius: 50%;
   overflow: hidden;
-
-  img {
-    height: auto;
-    object-fit: unset;
-  }
 }

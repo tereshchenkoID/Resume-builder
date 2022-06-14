@@ -17,7 +17,7 @@ const data = {
             {
               "name": "Select from list",
               "value": "-1",
-              "selected": true
+              "selected": false
             },
             {
               "name": "Fulltime",
@@ -27,7 +27,7 @@ const data = {
             {
               "name": "Freelance",
               "value": "2",
-              "selected": false
+              "selected": true
             }
           ]
         },

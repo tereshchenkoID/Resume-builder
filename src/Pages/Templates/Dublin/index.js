@@ -2,14 +2,22 @@ import React from "react";
 
 import styles from './index.module.scss';
 
-const Dublin = ({config, user, photo}) => {
-
+const Dublin = ({config, user, photo, refTemplate}) => {
     const check = (data) => {
         return user && user.hasOwnProperty(data) ? user[data] : ''
     }
 
+    // useEffect(() => {
+    //     if (ref) {
+    //         const count = Math.ceil(ref.current.offsetHeight / 1122.52)
+    //
+    //         ref.current.style = `height: ${count * 1122}px`
+    //
+    //     }
+    // }, [ref]);
+
     return (
-        <div className={styles.block} id={"dublin"}>
+        <div className={styles.block} id={"dublin"} ref={refTemplate}>
             <div className={styles.left}>
                 <div className={styles.wrapper}>
                     {

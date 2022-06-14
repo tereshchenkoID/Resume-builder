@@ -33,6 +33,7 @@
     "slate": "^0.80.0",
     "slate-react": "^0.80.0",
     "slick-carousel": "^1.8.1",
+    "use-debounce": "^8.0.1",
     "web-vitals": "^1.0.1",
     "with": "^7.0.2"
   },
