@@ -27,7 +27,6 @@
   left: 0;
   bottom: 0;
   overflow: hidden;
-  z-index: 1;
 
   @include media-breakpoint-up(lg) {
     justify-content: center;
@@ -108,6 +107,7 @@
 }
 
 .field,
+.textarea,
 .select {
   @include make-spacer('py', 2);
   @include make-spacer('px', 3);
@@ -122,6 +122,27 @@
 
   &:focus {
     outline: 1px solid var(--color-primary);
+  }
+}
+
+.textarea {
+  @include make-spacer('py', 4);
+
+  height: 250px;
+  resize: none;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: var(--color-secondary);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    background-clip: content-box;
+    background-color: var(--color-primary);
   }
 }
 
@@ -258,6 +279,7 @@
   color: var(--color-secondary);
 
   svg {
+    @include size(24px);
     @include make-spacer('mr', 1);
 
     path {
@@ -310,13 +332,11 @@
   @include make-spacer('mb', 2);
 
   display: none;
+  color: var(--color-white);
 
   @include media-breakpoint-up(lg) {
     @include flex(center, center);
   }
-
-
-  color: var(--color-white);
 
   span {
     @include make-spacer('mx', 1);
@@ -324,6 +344,8 @@
 }
 
 .arrow {
+  @include size(24px);
+
   color: var(--color-white);
 
   &:first-child {

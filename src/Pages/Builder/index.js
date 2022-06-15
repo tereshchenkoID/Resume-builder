@@ -21,6 +21,7 @@ import getConstant from "../../helpers/getConstant";
 
 import styles from './index.module.scss';
 
+
 const Dublin = React.lazy(() => import('../Templates/Dublin'))
 const Sydney = React.lazy(() => import('../Templates/Sydney'))
 
@@ -101,7 +102,18 @@ const Main = () => {
     }, 1000);
 
     const handleEditorChange = useDebouncedCallback((state, name) => {
-        convertContentToHTML(state, name);
+        const {value} = state.target;
+
+        setUser(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+
+        localStorage.setItem('user', JSON.stringify(user))
+
+        updateCanvas()
+
+        // convertContentToHTML(state, name);
     }, 1000);
 
     const convertContentToHTML = (state, name) => {
@@ -183,12 +195,15 @@ const Main = () => {
             const PDF_Width = HTML_Width;
             const PDF_Height = PDF_Width * a4.diff;
 
-            setPages(Math.ceil(HTML_Height / PDF_Height) - 1)
+            const total = Math.ceil(HTML_Height / PDF_Height) - 1
 
-            // if (current > pages) {
-            //     setCurrent(pages)
-            //     localStorage.setItem('current', pages)
-            // }
+            setPages(total)
+
+            if (current > total) {
+                setCurrent(total)
+
+                localStorage.setItem('current', total)
+            }
 
             refCanvas.current.innerHTML = '';
 
@@ -203,7 +218,7 @@ const Main = () => {
             ).then(
                 (canvas) => {
                     canvas.getContext('2d');
-                    canvas.style = `width: ${PDF_Width}px; transform: translateY(-${current * PDF_Height}px);`
+                    canvas.style = `width: ${PDF_Width}px; transform: translateY(-${localStorage.getItem('current') * PDF_Height}px);`
 
                     setInit(true)
 
@@ -317,7 +332,6 @@ const Main = () => {
                     updateCanvas={updateCanvas}
                 />
             </div>
-
             <div className={styles.left}>
                 <div className={styles.head}>
                     <button
@@ -371,6 +385,7 @@ const Main = () => {
                                                     className={classNames(styles.link, styles.primary)}
                                                     onClick={() => {
                                                         setModal(true)
+                                                        setRemove(false)
                                                     }}
                                                 >
                                                     {
@@ -408,23 +423,31 @@ const Main = () => {
                                                             name={item.name}
                                                             defaultValue={user[item.name] || item.value}
                                                             onChange={(e) => handleChange(e)}
+                                                            autoComplete={'true'}
                                                         />
                                                     </div>
                                         } else if (item.type === "textarea") {
                                             return <div className={styles.wrapper} key={index}>
                                                         <p className={styles.label}>{item.label}</p>
-                                                        <Editor
-                                                            onEditorStateChange={(state) => {
-                                                                handleEditorChange(state, item.name)
-                                                            }}
-                                                            defaultEditorState={convertToEditor(user[item.name] || `<p>${item.value}</p>`)}
-                                                            toolbarClassName={styles.toolbarClassName}
-                                                            wrapperClassName={styles.wrapperClassName}
-                                                            editorClassName={styles.editorClassName}
-                                                            toolbar={{
-                                                                options: ['inline', 'list', 'textAlign', 'link'],
-                                                            }}
+                                                        <textarea
+                                                            className={styles.textarea}
+                                                            name={item.name}
+                                                            onChange={(e) => {handleEditorChange(e, item.name)}}
+                                                            defaultValue={user[item.name] || item.value}
+                                                            autoComplete={'true'}
                                                         />
+                                                        {/*<Editor*/}
+                                                        {/*    onEditorStateChange={(state) => {*/}
+                                                        {/*        handleEditorChange(state, item.name)*/}
+                                                        {/*    }}*/}
+                                                        {/*    defaultEditorState={convertToEditor(user[item.name] || `<p>${item.value}</p>`)}*/}
+                                                        {/*    toolbarClassName={styles.toolbarClassName}*/}
+                                                        {/*    wrapperClassName={styles.wrapperClassName}*/}
+                                                        {/*    editorClassName={styles.editorClassName}*/}
+                                                        {/*    toolbar={{*/}
+                                                        {/*        options: ['inline', 'list', 'textAlign', 'link'],*/}
+                                                        {/*    }}*/}
+                                                        {/*/>*/}
                                                     </div>
                                         } else if (item.type === "select") {
                                             return <div className={styles.wrapper} key={index}>

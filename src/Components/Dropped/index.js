@@ -68,19 +68,70 @@ const Dropped = ({remove, action, close, updateCanvas}) => {
             <div className={styles.footer}>
                 {
                     dropped &&
-                    <button
-                        className={styles.button}
-                        onClick={() => {
-                            if (editor) {
-                                action(editor.getImage().toDataURL())
-                                localStorage.setItem('photo', JSON.stringify(editor.getImage().toDataURL()));
-                                close(false)
-                                updateCanvas()
-                            }
-                        }}
-                    >
-                        Save Changes
-                    </button>
+                    <>
+                        <label
+                            className={styles.upload}
+                            htmlFor={'file'}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none">
+                                <mask id="a" maskType="alpha" maskUnits="userSpaceOnUse" x="11" y="15" width="2" height="6">
+                                    <path d="M11 15h2v6h-2v-6z" fill="url(#paint0_linear)"/>
+                                </mask>
+                                <g mask="url(#a)">
+                                    <path d="M11 15h2v6h-2v-6z" fill="#B8BECC"/>
+                                </g>
+                                <mask id="b" maskType="alpha" maskUnits="userSpaceOnUse" x="3" y="7" width="2" height="8">
+                                    <path fill="url(#paint1_linear)" d="M3 7h2v8H3z"/>
+                                </mask>
+                                <g mask="url(#b)">
+                                    <path fill="#B8BECC" d="M3 7h2v8H3z"/>
+                                </g>
+                                <mask id="c" maskType="alpha" maskUnits="userSpaceOnUse" x="19" y="7" width="2" height="8">
+                                    <path fill="url(#paint2_linear)" d="M19 7h2v8h-2z"/>
+                                </mask>
+                                <g mask="url(#c)">
+                                    <path fill="#B8BECC" d="M19 7h2v8h-2z"/>
+                                </g>
+                                <path fillRule="evenodd" clipRule="evenodd" d="M5 5v2H3V4.5C3 3.67 3.67 3 4.5 3h15c.83 0 1.5.67 1.5 1.5V7h-2V5H5zm6 6.16l-2.5 2.1-1.32-1.51 4.16-3.5a1 1 0 011.32 0l4.16 3.5-1.32 1.5-2.5-2.09V15h-2v-3.84z" fill="#B8BECC"/>
+                                <defs>
+                                    <linearGradient id="paint0_linear" x1="12" y1="15" x2="12" y2="21" gradientUnits="userSpaceOnUse">
+                                        <stop stopColor="#7A8599"/>
+                                        <stop offset="1" stopColor="#7A8599" stopOpacity="0"/>
+                                    </linearGradient>
+                                    <linearGradient id="paint1_linear" x1="4" y1="7" x2="4" y2="15" gradientUnits="userSpaceOnUse">
+                                        <stop stopColor="#7A8599"/>
+                                        <stop offset="1" stopColor="#7A8599" stopOpacity="0"/>
+                                    </linearGradient>
+                                    <linearGradient id="paint2_linear" x1="20" y1="7" x2="20" y2="15" gradientUnits="userSpaceOnUse">
+                                        <stop stopColor="#7A8599"/>
+                                        <stop offset="1" stopColor="#7A8599" stopOpacity="0"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <input
+                                type={"file"}
+                                className={styles.file}
+                                id={"file"}
+                                onChange={(e) => {
+                                    setDropped(e.target.files[0])
+                                }}
+                            />
+                            Upload new
+                        </label>
+                        <button
+                            className={styles.button}
+                            onClick={() => {
+                                if (editor) {
+                                    action(editor.getImage().toDataURL())
+                                    localStorage.setItem('photo', JSON.stringify(editor.getImage().toDataURL()));
+                                    close(false)
+                                    updateCanvas()
+                                }
+                            }}
+                        >
+                            Save Changes
+                        </button>
+                    </>
                 }
             </div>
         </div>
